@@ -1,4 +1,5 @@
 require('dotenv').config();
+user_controller = require('./controllers/Users')
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -10,6 +11,7 @@ const io = require('socket.io')(3000)
 // const MessageModel = require("../models/Messages");
 
 // connect to mongodb
+console.log(MONGO_URI)
 mongoose.connect(MONGO_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -32,9 +34,12 @@ app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:500
 app.use("/", mainRouter);
 
 app.get('/settings', function (req, res) {
-    res.send('Settings Page');
+    res.send('<h1> OK </h1>');
 });
 
+
+app.post('/sign-up', user_controller.register);
+app.post('/sign-in',user_controller.login)
 
 app.listen(PORT, () => {
     console.log("server start - " + PORT);
