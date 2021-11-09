@@ -9,6 +9,7 @@ const usersController = {};
 
 usersController.register = async (req, res, next) => {
     try {
+        console.log('hiiiiiiii')
         const {
             phonenumber,
             password,
@@ -18,7 +19,7 @@ usersController.register = async (req, res, next) => {
         let user = await UserModel.findOne({
             phonenumber: phonenumber
         })
-
+        
         if (user) {
             return res.status(httpStatus.BAD_REQUEST).json({
                 message: 'Phone number already exists'
@@ -27,14 +28,14 @@ usersController.register = async (req, res, next) => {
         //Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        let avatar  = await DocumentModel.findById("60c39f54f0b2c4268eb53367");
-        let coverImage  = await DocumentModel.findById("60c39eb8f0b2c4268eb53366");
+        let avatar  = await DocumentModel.findById("61896e3633a1813c6c3c0164");
+        let coverImage  = await DocumentModel.findById("61896e6fbc3d2f4014b28b34");
         user = new UserModel({
             phonenumber: phonenumber,
             password: hashedPassword,
             username: username,
-            avatar: "60c39f54f0b2c4268eb53367",
-            cover_image: "60c39eb8f0b2c4268eb53366"
+            avatar: "61896e3633a1813c6c3c0164",
+            cover_image: "61896e6fbc3d2f4014b28b34"
         });
 
         try {
@@ -257,7 +258,7 @@ usersController.show = async (req, res, next) => {
         } else {
             userId = req.userId;
         }
-
+        console.log(userId)
         let user = await UserModel.findById(userId).select('phonenumber username gender birthday avatar cover_image blocked_inbox blocked_diary').populate('avatar').populate('cover_image');
         if (user == null) {
             return res.status(httpStatus.NOT_FOUND).json({message: "Can not find user"});
@@ -297,7 +298,7 @@ usersController.setBlock = async (req, res, next) => {
 
         res.status(200).json({
             code: 200,
-            message: "Thao tác thành công",
+            message: "Success",
             data: user
         });
 
@@ -334,7 +335,7 @@ usersController.setBlockDiary = async (req, res, next) => {
 
         res.status(200).json({
             code: 200,
-            message: "Thao tác thành công",
+            message: "Success",
             data: user
         });
 
@@ -348,10 +349,10 @@ usersController.searchUser = async (req, res, next) => {
     try {
         let searchKey = new RegExp(req.body.keyword, 'i')
         let result = await UserModel.find({phonenumber: searchKey}).limit(10).populate('avatar').populate('cover_image').exec();
-
+        console.log('searchingggg')
         res.status(200).json({
             code: 200,
-            message: "Tìm kiếm thành công",
+            message: "Success",
             data: result
         });
 

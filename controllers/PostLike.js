@@ -7,6 +7,8 @@ postLikeController.action = async (req, res, next) => {
     try {
         let userId = req.userId;
         let post = await PostModel.findById(req.params.postId);
+        // console.log(userId)
+        // console.log(post)
         if (post == null) {
             return res.status(httpStatus.NOT_FOUND).json({message: "Can not find post"});
         }
@@ -31,7 +33,10 @@ postLikeController.action = async (req, res, next) => {
             return res.status(httpStatus.NOT_FOUND).json({message: "Can not find post"});
         }
         post.isLike = post.like.includes(req.userId);
+        // console.log(post.isLike)
         return res.status(httpStatus.OK).json({
+            code:200,
+            message: "Success",
             data: post
         });
     } catch (error) {

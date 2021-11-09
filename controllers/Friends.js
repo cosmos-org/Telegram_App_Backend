@@ -53,7 +53,7 @@ friendsController.setRequest = async (req, res, next) => {
             makeFriend.save();
             res.status(200).json({
                 code: 200,
-                message: "Gửi lời mời kết bạn thành công",
+                message: "Success",
                 data: makeFriend
             });
         }
@@ -72,7 +72,7 @@ friendsController.getRequest = async (req, res, next) => {
    
         res.status(200).json({
             code: 200,
-            message: "Danh sách lời mời kết bạn",
+            message: "Success",
             data: {
                 friends: users,
             }
@@ -113,9 +113,9 @@ friendsController.setAccept = async (req, res, next) => {
         friend.save();
         let mes;
         if (req.body.is_accept === '1') {
-            mes = "Kết bạn thành công";
+            mes = "Success accept";
         } else {
-            mes = "Từ chối thành công";
+            mes = "Success refuse";
         }
 
         res.status(200).json({
@@ -159,7 +159,7 @@ friendsController.setRemoveFriend = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             success: true,
-            message: "Xóa bạn thành công",
+            message: "Success delele friends",
             data: final
         });
     } catch (e) {
@@ -179,7 +179,7 @@ friendsController.listFriends = async (req, res, next) => {
 
             res.status(200).json({
                 code: 200,
-                message: "Danh sách bạn bè",
+                message: "Success. Danh sách bạn bè",
                 data: {
                     friends: users,
                 }

@@ -27,8 +27,8 @@ postCommentController.create = async (req, res, next) => {
 
         let postCommentSaved = await postComment.save();
         // update countComments post
-        console.log(req.params.postId)
-        console.log(post.countComments ? post.countComments + 1 : 1)
+        // console.log(req.params.postId)
+        // console.log(post.countComments ? post.countComments + 1 : 1)
         let postSaved = await PostModel.findByIdAndUpdate(req.params.postId, {
             countComments: post.countComments ? post.countComments + 1 : 1
         })
@@ -36,6 +36,8 @@ postCommentController.create = async (req, res, next) => {
             'username', 'phonenumber'
         ]);
         return res.status(httpStatus.OK).json({
+            code:200,
+            message:"Success",
             data: postCommentSaved,
             post: postSaved
         });

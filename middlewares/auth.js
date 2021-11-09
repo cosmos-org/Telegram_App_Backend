@@ -4,7 +4,9 @@ const httpStatus = require("../utils/httpStatus");
 
 const auth = async (req, res, next) => {
   try {
+    // console.log('---------------------')
     let authorization = req.headers.authorization.split(' ')[1], decoded;
+    // console.log(authorization)
     try {
         decoded = jwt.verify(authorization, process.env.JWT_SECRET);
     } catch (e) {
@@ -14,9 +16,11 @@ const auth = async (req, res, next) => {
         });
     }
     const userId = decoded.id;
+    // console.log(userId)
     let user;
     try {
         user = await UserModel.findById(userId);
+        // console.log(user)
         if (user == null) {
             return res.status(httpStatus.UNAUTHORIZED).json({
                 message: "UNAUTHORIZED"

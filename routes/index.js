@@ -5,6 +5,7 @@ const path = require("path");
 const mainRouter = express.Router();
 
 mainRouter.use("/api/v1", apiRoutes);
+console.log(path.join(__dirname, "../files"))
 mainRouter.use("/files/", express.static(path.join(__dirname, "../files")));
 
 module.exports = mainRouter;
