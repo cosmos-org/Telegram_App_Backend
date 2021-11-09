@@ -189,6 +189,8 @@ usersController.edit = async (req, res, next) => {
         }
         user = await UserModel.findById(userId).select('phonenumber username gender birthday avatar cover_image blocked_inbox blocked_diary').populate('avatar').populate('cover_image');
         return res.status(httpStatus.OK).json({
+            code:200,
+            message: "Success",
             data: user
         });
     } catch (e) {

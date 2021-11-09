@@ -61,10 +61,14 @@ chatController.send = async (req, res, next) => {
                 await message.save();
                 let messageNew = await MessagesModel.findById(message._id).populate('chat').populate('user');
                 return res.status(httpStatus.OK).json({
+                    code: 200,
+                    message: "Success",
                     data: messageNew
                 });
             } else {
                 return res.status(httpStatus.OK).json({
+                    code: 200,
+                    message: "Success",
                     data: chat,
                     message: 'Create chat success',
                     response: 'CREATE_CHAT_SUCCESS'
@@ -87,7 +91,9 @@ chatController.getMessages = async (req, res, next) => {
         let messages = await MessagesModel.find({
             chat: req.params.chatId
         }).populate('user');
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        return res.status(httpStatus.OK).json({
+            code: 200,
+            message: "Success",
             data: messages
         });
     } catch (e) {

@@ -57,6 +57,8 @@ postCommentController.list = async (req, res, next) => {
             'username', 'phonenumber'
         ]);
         return res.status(httpStatus.OK).json({
+            code:200,
+            message: "Success",
             data: postComments
         });
     } catch (error) {
