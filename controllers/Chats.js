@@ -101,6 +101,60 @@ chatController.getMessages = async (req, res, next) => {
             message: e.message
         });
     }
+};
+function sortLastest(ls) {
+    ls.sort(function(first, second) {
+        return second.updatedAt - first.updatedAt;
+       });
+    return ls;
+};
+chatController.getChats = async (req, res, next) => {
+    try {
+        let chats = await ChatModel.find({
+            member: req.userId
+        })
+
+        chats = await sortLastest(chats);
+
+        var newChats = await [];
+
+        for (var element of chats ){
+            
+            let messages = await MessagesModel.find({
+                chat: element._id
+            });
+            
+            messages =  sortLastest(messages);
+            console.log(messages[0]);
+            if (req.userId == messages[0].user) {
+                sender = 0;
+            } else {
+                sender = 1;
+            }
+            var new_element = {
+                member: element.member,
+                type: element.type,
+                _id: element._id,
+                createdAt: element.createdAt,
+                updatedAt: element.updatedAt,
+                __v: element.__v,
+                lastestMessage : messages[0].content,
+                sender : sender
+              }
+            newChats.push(new_element);
+        }
+
+        return res.status(httpStatus.OK).json({
+            code: 200,
+            message: "Success",
+            data: newChats
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
 }
+
 
 module.exports = chatController;
