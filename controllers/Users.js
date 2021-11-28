@@ -9,7 +9,7 @@ const usersController = {};
 
 usersController.register = async (req, res, next) => {
     try {
-        console.log('hiiiiiiii')
+        
         const {
             phonenumber,
             password,
@@ -351,7 +351,7 @@ usersController.searchUser = async (req, res, next) => {
     try {
         let searchKey = new RegExp(req.body.keyword, 'i')
         let result = await UserModel.find({phonenumber: searchKey}).limit(10).populate('avatar').populate('cover_image').exec();
-        console.log('searchingggg')
+        
         res.status(200).json({
             code: 200,
             message: "Success",

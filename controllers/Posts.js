@@ -10,10 +10,11 @@ const {JWT_SECRET} = require("../constants/constants");
 const {ROLE_CUSTOMER} = require("../constants/constants");
 const uploadFile = require('../functions/uploadFile');  
     const postsController = {};
+
 postsController.create = async (req, res, next) => {
-    console.log('create post --- ')
+    // console.log('create post --- ')
     let userId = req.userId;
-    console.log(userId)
+   
     // console.log(req.body)
     try {
         const {
@@ -233,11 +234,15 @@ postsController.delete = async (req, res, next) => {
 }
 
 postsController.list = async (req, res, next) => {
+    let perPage = 5; // số lượng post 1 trang
+    let page = req.query.page || 0; 
+    page = parseInt(page);
     try {
         let posts = [];
         let userId = req.userId;
         if (req.query.userId) {
             // get Post of one user
+           
             posts = await PostModel.find({
                 author: req.query.userId
             }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
@@ -249,8 +254,12 @@ postsController.list = async (req, res, next) => {
                     select: '_id fileName',
                     model: 'Documents',
                 },
-            });
+            }).sort({createdAt: -1}).skip(perPage * page)
+            .limit(perPage);
+
         } else {
+
+            
             // get list friend of 1 user
             let friends = await FriendModel.find({
                 status: "1",
@@ -263,7 +272,7 @@ postsController.list = async (req, res, next) => {
                 }
             ])
             let listIdFriends = [];
-            console.log(friends)
+            // console.log(friends)
             for (let i = 0; i < friends.length; i++) {
                 if (friends[i].sender.toString() === userId.toString()) {
                     listIdFriends.push(friends[i].receiver);
@@ -272,7 +281,7 @@ postsController.list = async (req, res, next) => {
                 }
             }
             listIdFriends.push(userId);
-            console.log(listIdFriends);
+            // console.log(listIdFriends);
             // get post of friends of 1 user
             posts = await PostModel.find({
                 "author": listIdFriends
@@ -285,7 +294,9 @@ postsController.list = async (req, res, next) => {
                     select: '_id fileName',
                     model: 'Documents',
                 },
-            });
+            }).sort({createdAt: -1}).skip(perPage * page)
+            .limit(perPage);
+           
         }
         let postWithIsLike = [];
         for (let i = 0; i < posts.length; i ++) {
@@ -293,7 +304,10 @@ postsController.list = async (req, res, next) => {
             postItem.isLike = postItem.like.includes(req.userId);
             postWithIsLike.push(postItem);
         }
+        // postWithIsLike = sortLastest(postWithIsLike);
         return res.status(httpStatus.OK).json({
+            code: 200,
+            message: 'Success',
             data: postWithIsLike
         });
     } catch (error) {

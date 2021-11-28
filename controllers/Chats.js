@@ -6,6 +6,14 @@ const ChatModel = require("../models/Chats");
 const MessagesModel = require("../models/Messages");
 const httpStatus = require("../utils/httpStatus");
 const chatController = {};
+
+// function sortLastest(ls) {
+//     ls.sort(function(first, second) {
+//         return second.updatedAt - first.updatedAt;
+//        });
+//     return ls;
+// };
+
 chatController.send = async (req, res, next) => {
     try {
         let userId = req.userId;
@@ -87,10 +95,14 @@ chatController.send = async (req, res, next) => {
     }
 }
 chatController.getMessages = async (req, res, next) => {
+    let perPage = 50; // số lượng message 1 trang
+    let page = req.query.page || 0; 
+    page = parseInt(page);
     try {
         let messages = await MessagesModel.find({
             chat: req.params.chatId
-        }).populate('user');
+        }).sort({createdAt: -1}).skip(perPage * page)
+        .limit(perPage).populate('user');; 
         return res.status(httpStatus.OK).json({
             code: 200,
             message: "Success",
@@ -102,19 +114,14 @@ chatController.getMessages = async (req, res, next) => {
         });
     }
 };
-function sortLastest(ls) {
-    ls.sort(function(first, second) {
-        return second.updatedAt - first.updatedAt;
-       });
-    return ls;
-};
+
 chatController.getChats = async (req, res, next) => {
     try {
         let chats = await ChatModel.find({
             member: req.userId
-        })
+        }).sort({updatedAt: -1});; 
 
-        chats = await sortLastest(chats);
+        // chats = await sortLastest(chats);
 
         var newChats = await [];
 
@@ -122,10 +129,8 @@ chatController.getChats = async (req, res, next) => {
             
             let messages = await MessagesModel.find({
                 chat: element._id
-            });
-            
-            messages =  sortLastest(messages);
-            console.log(messages[0]);
+            }).sort({createdAt: -1});
+
             if (req.userId == messages[0].user) {
                 sender = 0;
             } else {
