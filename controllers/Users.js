@@ -349,8 +349,9 @@ usersController.setBlockDiary = async (req, res, next) => {
 }
 usersController.searchUser = async (req, res, next) => {
     try {
-        let searchKey = new RegExp(req.body.keyword, 'i')
-        let result = await UserModel.find({phonenumber: searchKey}).limit(10).populate('avatar').populate('cover_image').exec();
+        let searchKey = new RegExp(req.body.keyword.toLowerCase(), 'i')
+        let result = await UserModel.find( { $or:[ {phonenumber: { "$regex": searchKey }} ,
+           {username: { "$regex": searchKey }}] }).limit(10).populate('avatar').populate('cover_image').exec();
         
         res.status(200).json({
             code: 200,

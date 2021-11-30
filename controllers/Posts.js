@@ -315,4 +315,26 @@ postsController.list = async (req, res, next) => {
     }
 }
 
+postsController.searchPosts = async (req, res, next) => {
+    try {
+        let searchKey = new RegExp(req.body.keyword.toLowerCase(), 'i')
+        let result = await PostModel.find({described:  { "$regex": searchKey }}).limit(10).populate({
+            path: 'author',
+            populate: { path: 'avatar' }
+          }).populate('images').populate('videos').exec();
+        
+        res.status(200).json({
+            code: 200,
+            message: "Success",
+            data: result
+        });
+
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
+
+
 module.exports = postsController;

@@ -34,5 +34,10 @@ postsRoutes.get(
     asyncWrapper(postsController.list),
 );
 
+postsRoutes.post(
+    "/search",
+    auth,
+    asyncWrapper(postsController.searchPosts),
+);
 
 module.exports = postsRoutes;
