@@ -4,6 +4,7 @@ const {
 } = require('../constants/constants');
 const ChatModel = require("../models/Chats");
 const MessagesModel = require("../models/Messages");
+const UserModel = require("../models/Users");
 const httpStatus = require("../utils/httpStatus");
 const chatController = {};
 
@@ -116,6 +117,8 @@ chatController.getMessages = async (req, res, next) => {
 };
 
 chatController.getChats = async (req, res, next) => {
+    let currentUserId = req.userId;
+
     try {
         let chats = await ChatModel.find({
             member: req.userId
@@ -126,7 +129,9 @@ chatController.getChats = async (req, res, next) => {
         var newChats = await [];
 
         for (var element of chats ){
-            
+    
+            let finalId = element.member[0] == currentUserId? element.member[1] : element.member[0];
+            let partnerUser = await UserModel.findById(finalId).populate('avatar');
             let messages = await MessagesModel.find({
                 chat: element._id
             }).sort({createdAt: -1});
@@ -137,13 +142,15 @@ chatController.getChats = async (req, res, next) => {
                 sender = 1;
             }
             var new_element = {
+                partnerName: partnerUser.username,
+                partnerAvatar: partnerUser.avatar.fileName,
                 member: element.member,
                 type: element.type,
                 _id: element._id,
                 createdAt: element.createdAt,
                 updatedAt: element.updatedAt,
                 __v: element.__v,
-                lastestMessage : messages[0].content,
+                latestMessage : messages[0].content,
                 sender : sender
               }
             newChats.push(new_element);

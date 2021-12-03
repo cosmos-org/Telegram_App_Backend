@@ -6,6 +6,7 @@ const mainRouter = require("./routes/index");
 const {PORT} = require("./constants/constants");
 const {MONGO_URI} = require("./constants/constants");
 const bodyParser = require('body-parser');
+var http = require("http");
 // const io = require('socket.io')(3000)
 // const MessageModel = require("../models/Messages");
 
@@ -40,20 +41,53 @@ app.listen(PORT, () => {
     console.log("server start - " + PORT);
 })
 
-// Socket.io chat realtime
-// io.on('connection', (socket) => {
-//     MessageModel.find().then(result => {
-//         socket.emit('output-messages', result)
-//     })
-//     console.log('a user connected');
-//     socket.emit('message', 'Hello world');
-//     socket.on('disconnect', () => {
-//         console.log('user disconnected');
-//     });
-//     socket.on('chatmessage', msg => {
-//         // const message = new MessageModel({ msg });
-//         message.save().then(() => {
-//             io.emit('message', msg)
-//         })
-//     })
-// });
+
+const socketApp = express();
+const socketPort =  7070;
+var socketServer = http.createServer(socketApp);
+var io = require("socket.io")(socketServer);
+
+
+
+//middlewre
+socketApp.use(express.json());
+var clients = {};
+
+io.on("connection", (socket) => {
+  console.log("connetetd");
+  console.log(socket.id, "has joined");
+  socket.on("signin", (id) => {
+    console.log(id);
+    clients[id] = socket;
+    console.log(clients.length);
+  }
+  );
+  socket.on("message", (msg) => {
+    console.log(msg);
+    let targetId = msg.to;
+    if (clients[targetId]) clients[targetId].emit("message", msg);
+  });
+  socket.on('disconnect', () => {
+    let toDeleteUser;
+    for (let key of Object.entries(clients)) {
+      // index 1, returns the value for each map key
+      let tmp_socket = key[1];
+      if (tmp_socket == socket) {
+        toDeleteUser = key[0];
+      }
+    }
+    console.log('Deleting User: ' + toDeleteUser);
+    if (undefined != toDeleteUser) {
+      delete clients[toDeleteUser];
+      socket.removeAllListeners('message');
+		  socket.removeAllListeners('disconnect');
+    }
+    console.log(clients.length);
+  })
+}
+);
+
+socketServer.listen(socketPort, "0.0.0.0", () => {
+  console.log("server socket started");
+});
+
