@@ -49,7 +49,7 @@ usersController.register = async (req, res, next) => {
             );
             res.status(httpStatus.CREATED).json({
                 data: {
-                    id: savedUser._id,
+                    _id: savedUser._id,
                     phonenumber: savedUser.phonenumber,
                     username: savedUser.username,
                     avatar: avatar,
@@ -101,7 +101,7 @@ usersController.login = async (req, res, next) => {
         delete user["password"];
         return res.status(httpStatus.OK).json({
             data: {
-                id: user._id,
+                _id: user._id,
                 phonenumber: user.phonenumber,
                 username: user.username,
             },
