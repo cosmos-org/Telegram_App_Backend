@@ -267,6 +267,8 @@ usersController.show = async (req, res, next) => {
         }
 
         return res.status(httpStatus.OK).json({
+            code:200,
+            message: "Success",
             data: user
         });
     } catch (error) {
