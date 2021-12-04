@@ -103,7 +103,13 @@ chatController.getMessages = async (req, res, next) => {
         let messages = await MessagesModel.find({
             chat: req.params.chatId
         }).sort({createdAt: -1}).skip(perPage * page)
-        .limit(perPage).populate('user');; 
+        .limit(perPage).populate('user').populate({
+            path: 'user',
+            select: '_id username phonenumber avatar',
+            populate: {
+                path: 'avatar'
+            }
+            }); 
         return res.status(httpStatus.OK).json({
             code: 200,
             message: "Success",
@@ -134,7 +140,7 @@ chatController.getChats = async (req, res, next) => {
             let partnerUser = await UserModel.findById(finalId).populate('avatar');
             let messages = await MessagesModel.find({
                 chat: element._id
-            }).sort({createdAt: -1});
+            }).sort({updatedAt: -1});
 
             if (req.userId == messages[0].user) {
                 sender = 0;
