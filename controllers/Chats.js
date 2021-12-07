@@ -137,7 +137,7 @@ chatController.getChats = async (req, res, next) => {
         for (var element of chats ){
     
             let finalId = element.member[0] == currentUserId? element.member[1] : element.member[0];
-            let partnerUser = await UserModel.findById(finalId).populate('avatar');
+            let partnerUser = await UserModel.findOne({_id: finalId},{username: 1, avatar: 1, phonenumber: 1}).populate({path:'avatar',select: '_id type fileName'});
             let messages = await MessagesModel.find({
                 chat: element._id
             }).sort({updatedAt: -1});
@@ -148,8 +148,9 @@ chatController.getChats = async (req, res, next) => {
                 sender = 1;
             }
             var new_element = {
-                partnerName: partnerUser.username,
-                partnerAvatar: partnerUser.avatar.fileName,
+                // partnerName: partnerUser.username,
+                // partnerAvatar: partnerUser.avatar.fileName,
+                partner: partnerUser,
                 member: element.member,
                 type: element.type,
                 _id: element._id,
