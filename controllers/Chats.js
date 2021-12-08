@@ -150,7 +150,7 @@ chatController.getChats = async (req, res, next) => {
             var new_element = {
                 // partnerName: partnerUser.username,
                 // partnerAvatar: partnerUser.avatar.fileName,
-                partner: partnerUser,
+                partnerUser: partnerUser,
                 member: element.member,
                 type: element.type,
                 _id: element._id,
@@ -158,7 +158,8 @@ chatController.getChats = async (req, res, next) => {
                 updatedAt: element.updatedAt,
                 __v: element.__v,
                 latestMessage : messages[0].content,
-                sender : sender
+                sender : sender,
+                lastMessageTime: messages[0].updatedAt
               }
             newChats.push(new_element);
         }
