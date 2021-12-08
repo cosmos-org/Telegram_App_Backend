@@ -260,7 +260,7 @@ usersController.show = async (req, res, next) => {
         } else {
             userId = req.userId;
         }
-        console.log(userId)
+        // console.log(userId)
         let user = await UserModel.findById(userId).select('phonenumber username gender birthday avatar cover_image blocked_inbox blocked_diary').populate('avatar').populate('cover_image');
         if (user == null) {
             return res.status(httpStatus.NOT_FOUND).json({message: "Can not find user"});
