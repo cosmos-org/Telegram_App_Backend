@@ -18,7 +18,7 @@ uploadFile.matchesFileBase64 = (fileBase64) => {
         console.log(Array.isArray(matches))
         return false;
     }
-    consolo.log('matchhh')
+  
     return true;
 }
 
