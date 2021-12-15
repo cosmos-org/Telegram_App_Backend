@@ -1,12 +1,16 @@
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/Users");
 const FriendModel = require("../models/Friends");
+const ChatModel = require("../models/Chats");
 const httpStatus = require("../utils/httpStatus");
 const bcrypt = require("bcrypt");
 const {JWT_SECRET} = require("../constants/constants");
 const {ROLE_CUSTOMER} = require("../constants/constants");
 const friendsController = {};
-
+const {
+    PRIVATE_CHAT,
+    GROUP_CHAT,
+} = require('../constants/constants');
 // 0: gửi lời mời
 // 1: kết bạn
 // 2: từ chối
@@ -88,7 +92,6 @@ friendsController.setAccept = async (req, res, next) => {
     try {
         let receiver = req.userId;
         let sender = req.body.user_id;
-
         let friend = await FriendModel.findOne({ sender: sender, receiver: receiver });
 
         if (req.body.is_accept != '1' && req.body.is_accept != '2') {
@@ -114,14 +117,22 @@ friendsController.setAccept = async (req, res, next) => {
         let mes;
         if (req.body.is_accept === '1') {
             mes = "Success accept";
+            chat = new ChatModel({
+                type: PRIVATE_CHAT,
+                member: [
+                    receiver,
+                    sender
+                ]});
+                await chat.save();
         } else {
             mes = "Success refuse";
+            chat = {}
         }
 
         res.status(200).json({
             code: 200,
             message: mes,
-            data: friend,
+            data: {friend: friend,chat:chat},
             success: true,
 
         });
