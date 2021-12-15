@@ -124,15 +124,31 @@ friendsController.setAccept = async (req, res, next) => {
                     sender
                 ]});
                 await chat.save();
+                let finalId = chat.member[0] == receiver? chat.member[1] : chat.member[0];
+                let partnerUser = await UserModel.findOne({_id: finalId},{username: 1, avatar: 1, phonenumber: 1}).populate({path:'avatar',select: '_id type fileName'});
+                
+                var new_chat = {
+                // partnerName: partnerUser.username,
+                // partnerAvatar: partnerUser.avatar.fileName,
+                partnerUser: partnerUser,
+                member: chat.member,
+                type: chat.type,
+                _id: chat._id,
+                createdAt: chat.createdAt,
+                updatedAt: chat.updatedAt,
+                latestMessage : '',
+                sender : 1,
+                lastMessageTime: ''
+              }
         } else {
             mes = "Success refuse";
-            chat = {}
+            new_chat = {}
         }
 
         res.status(200).json({
             code: 200,
             message: mes,
-            data: {friend: friend,chat:chat},
+            data: {friend: friend,chat:new_chat},
             success: true,
 
         });

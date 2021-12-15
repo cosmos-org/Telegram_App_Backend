@@ -124,7 +124,6 @@ chatController.getMessages = async (req, res, next) => {
 
 chatController.getChats = async (req, res, next) => {
     let currentUserId = req.userId;
-
     try {
         let chats = await ChatModel.find({
             member: req.userId
@@ -141,11 +140,22 @@ chatController.getChats = async (req, res, next) => {
             let messages = await MessagesModel.find({
                 chat: element._id
             }).sort({updatedAt: -1});
-
-            if (req.userId == messages[0].user) {
-                sender = 0;
-            } else {
-                sender = 1;
+            let latestMessage;
+            let sender;
+            let lastMessageTime;
+            if (messages.length == 0) {
+                 latestMessage =  '';
+                 sender =  1;
+                 lastMessageTime = '';
+            }
+            else {
+                latestMessage =  messages[0].content;
+                lastMessageTime = messages[0].createdAt;
+                if (req.userId == messages[0].user) {
+                    sender = 0;
+                } else {
+                    sender = 1;
+                }
             }
             var new_element = {
                 // partnerName: partnerUser.username,
@@ -157,9 +167,9 @@ chatController.getChats = async (req, res, next) => {
                 createdAt: element.createdAt,
                 updatedAt: element.updatedAt,
                 __v: element.__v,
-                latestMessage : messages[0].content,
+                latestMessage : latestMessage,
                 sender : sender,
-                lastMessageTime: messages[0].updatedAt
+                lastMessageTime: lastMessageTime
               }
             newChats.push(new_element);
         }
