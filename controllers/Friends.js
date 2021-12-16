@@ -87,6 +87,25 @@ friendsController.getRequest = async (req, res, next) => {
         });
     }
 }
+friendsController.getSentRequest = async (req, res, next) => {
+    try {
+        let sender = req.userId;
+        let requested = await FriendModel.find({sender: sender, status: "0" }).distinct('receiver')
+        let users = await UserModel.find().where('_id').in(requested).populate('avatar').populate('cover_image').exec()
+   
+        res.status(200).json({
+            code: 200,
+            message: "Success",
+            data: {
+                friends: users,
+            }
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
 
 friendsController.setAccept = async (req, res, next) => {
     try {
@@ -151,6 +170,44 @@ friendsController.setAccept = async (req, res, next) => {
             data: {friend: friend,chat:new_chat},
             success: true,
 
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
+
+friendsController.setRemoveRequest = async (req, res, next) => {
+    try {
+        let receiver = req.userId;
+        let sender = req.body.user_id;
+
+        let friendRc1 = await FriendModel.findOne({ sender: sender, receiver: receiver });
+        let friendRc2 = await FriendModel.findOne({ sender: receiver, receiver: sender });
+        let final;
+        if (friendRc1 == null) {
+            final = friendRc2;
+        } else {
+            final = friendRc1;
+        }
+        console.log(final)
+        if (final.status != '0') {
+            res.status(200).json({
+                code: 200,
+                success: false,
+                message: "Cannot commit",
+            });
+        }
+
+        final.status = '2';
+        final.save();
+
+        res.status(200).json({
+            code: 200,
+            success: true,
+            message: "Success delele friends request",
+            data: final
         });
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
