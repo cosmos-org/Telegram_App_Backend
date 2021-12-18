@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/Users");
 const DocumentModel = require("../models/Documents");
+const FriendModel = require("../models/Friends");
 const httpStatus = require("../utils/httpStatus");
 const bcrypt = require("bcrypt");
 const {JWT_SECRET} = require("../constants/constants");
@@ -279,6 +280,10 @@ usersController.setBlock = async (req, res, next) => {
     try {
         let targetId = req.body.user_id;
         let type = req.body.type;
+
+      
+    
+
         let user = await UserModel.findById(req.userId);
         blocked = []
         if (user.hasOwnProperty('blocked')) {
@@ -290,6 +295,19 @@ usersController.setBlock = async (req, res, next) => {
             if(blocked.indexOf(targetId) === -1) {
                 blocked.push(targetId);
             }
+            let friendRc1 = await FriendModel.findOne({ sender: targetId, receiver:  req.userId });
+            let friendRc2 = await FriendModel.findOne({ sender: req.userId, receiver: targetId });
+            let final;
+            if (friendRc1 == null) {
+                final = friendRc2;
+            } else {
+                final = friendRc1;
+            }
+            if (final != null)
+            {
+                final.status = '3';
+                final.save();
+            }
         } else {
             const index = blocked.indexOf(targetId);
             if (index > -1) {
@@ -299,6 +317,9 @@ usersController.setBlock = async (req, res, next) => {
 
         user.blocked_inbox = blocked;
         user.save();
+
+        // remove friend and friend request here
+
 
         res.status(200).json({
             code: 200,
@@ -351,9 +372,23 @@ usersController.setBlockDiary = async (req, res, next) => {
 }
 usersController.searchUser = async (req, res, next) => {
     try {
+        let userId = req.userId;
+        let user = await UserModel.findById(userId);
+        let blocked_list = user.blocked_inbox;
+        console.log(blocked_list);
         let searchKey = new RegExp(req.body.keyword.toLowerCase(), 'i')
-        let result = await UserModel.find( { $or:[ {phonenumber: { "$regex": searchKey }} ,
-           {username: { "$regex": searchKey }}] }).populate('avatar').populate('cover_image').exec();
+        let result = await UserModel.find( { $and : [
+            {
+                    $or:
+                    [ 
+                        {phonenumber: { "$regex": searchKey }} ,
+                        {username: { "$regex": searchKey }}
+                    ] 
+            },
+            {
+                _id: {$nin : blocked_list}
+            }
+        ]}).populate('avatar').populate('cover_image').exec();
         
         res.status(200).json({
             code: 200,

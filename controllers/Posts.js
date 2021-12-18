@@ -242,20 +242,34 @@ postsController.list = async (req, res, next) => {
         let userId = req.userId;
         if (req.query.userId) {
             // get Post of one user
-           
-            posts = await PostModel.find({
-                author: req.query.userId
-            }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
-                path: 'author',
-                select: '_id username phonenumber avatar',
-                model: 'Users',
-                populate: {
-                    path: 'avatar',
-                    select: '_id fileName',
-                    model: 'Documents',
-                },
-            }).sort({createdAt: -1}).skip(perPage * page)
-            .limit(perPage);
+
+             //get friends
+            let requested = await FriendModel.find({sender: req.userId, status: "1" }).distinct('receiver')
+            let accepted = await FriendModel.find({receiver: req.userId, status: "1" }).distinct('sender')
+            let users_friends = await UserModel.find().where('_id').in(requested.concat(accepted)).exec()
+            let users_friends_ids = users_friends.map(u => {
+                return u._id
+            })
+            
+            if (!users_friends_ids.includes(req.query.userId)){
+                posts = [];
+            }
+            
+            else {
+                posts = await PostModel.find({
+                    author: req.query.userId
+                }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
+                    path: 'author',
+                    select: '_id username phonenumber avatar',
+                    model: 'Users',
+                    populate: {
+                        path: 'avatar',
+                        select: '_id fileName',
+                        model: 'Documents',
+                    },
+                }).sort({createdAt: -1}).skip(perPage * page)
+                .limit(perPage);
+            }
 
         } else {
 
