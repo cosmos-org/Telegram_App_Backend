@@ -10,12 +10,8 @@ const {
 const uploadFile = {};
 
 uploadFile.matchesFileBase64 = (fileBase64) => {
-    // console.log(typeof(fileBase64))
-    const matches = fileBase64.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    const matches = fileBase64.match(/^data:([A-Z0-9a-z-+/]+);base64,(.+)$/);
     if (!Array.isArray(matches) || matches.length !== 3) {
-        console.log('not match')
-        console.log(matches.length)
-        console.log(Array.isArray(matches))
         return false;
     }
   
@@ -23,8 +19,8 @@ uploadFile.matchesFileBase64 = (fileBase64) => {
 }
 
 uploadFile.uploadFile = (fileBase64) => {
-    console.log('calll')
-    const matches = fileBase64.match(/^data:([A-Za-z-+/]+);base64,(.+)$/), response = {};
+
+    const matches = fileBase64.match(/^data:([A-Z0-9a-z-+/]+);base64,(.+)$/), response = {};
 
     if (!Array.isArray(matches) || matches.length !== 3) {
         return false;
@@ -38,7 +34,6 @@ uploadFile.uploadFile = (fileBase64) => {
     let type = decodedImg.type;
 
     let extension = mime.getExtension(type);
-    console.log(extension)
     let documentType = DOCUMENT_TYPE_OTHER;
 
     if (type.toString().includes(DOCUMENT_TYPE_VIDEO)) {

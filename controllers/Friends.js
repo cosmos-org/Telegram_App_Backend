@@ -191,7 +191,6 @@ friendsController.setRemoveRequest = async (req, res, next) => {
         } else {
             final = friendRc1;
         }
-        console.log(final)
         if (final.status != '0') {
             res.status(200).json({
                 code: 200,
