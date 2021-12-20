@@ -276,5 +276,26 @@ friendsController.listFriends = async (req, res, next) => {
     }
 }
 
+friendsController.getFriends = async (req, res, next) => {
+    try {
+        let user_id = req.body.user_id;
 
+        let requested = await FriendModel.find({sender: user_id, status: "1" }).distinct('receiver')
+        let accepted = await FriendModel.find({receiver: user_id, status: "1" }).distinct('sender')
+
+        let friends = await UserModel.find().where('_id').in(requested.concat(accepted)).populate('avatar').populate('cover_image').exec()
+
+        res.status(200).json({
+            code: 200,
+            message: "Success. Danh sách bạn bè theo user id",
+            data: {
+                friends: friends,
+            }
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
 module.exports = friendsController;

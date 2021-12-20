@@ -22,4 +22,10 @@ chatsRoutes.get(
     asyncWrapper(chatController.getChats),
 );
 
+chatsRoutes.get(
+    "/getChatById/:chat_id",
+    auth,
+    asyncWrapper(chatController.getChatById),
+);
+
 module.exports = chatsRoutes;

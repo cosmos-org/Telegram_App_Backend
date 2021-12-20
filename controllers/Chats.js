@@ -123,8 +123,9 @@ chatController.getMessages = async (req, res, next) => {
 };
 
 chatController.getChats = async (req, res, next) => {
-    let currentUserId = req.userId;
+    
     try {
+        let currentUserId = req.userId;
         let chats = await ChatModel.find({
             member: req.userId
         }).sort({updatedAt: -1});; 
@@ -186,5 +187,62 @@ chatController.getChats = async (req, res, next) => {
     }
 }
 
+chatController.getChatById = async (req, res, next) => {
+    try {
+        let currentUserId = req.userId;
+        let chatId = req.params.chat_id;
+        let chat = await ChatModel.findById(chatId);
+        if (!chat.member.includes(currentUserId)){
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+                message: 'Not your chat'
+            });
+        }
+   
+        let finalId = chat.member[0] == currentUserId? chat.member[1] : chat.member[0];
+        let partnerUser = await UserModel.findOne({_id: finalId},{username: 1, avatar: 1, phonenumber: 1}).populate({path:'avatar',select: '_id type fileName'});
+        let messages = await MessagesModel.find({
+            chat: chat._id
+        }).sort({updatedAt: -1});
+        let latestMessage;
+        let sender;
+        let lastMessageTime;
+        if (messages.length == 0) {
+                latestMessage =  '';
+                sender =  1;
+                lastMessageTime = '';
+        }
+        else {
+            latestMessage =  messages[0].content;
+            lastMessageTime = messages[0].createdAt;
+            if (req.userId == messages[0].user) {
+                sender = 0;
+            } else {
+                sender = 1;
+            }
+        }
+        var new_element = {
+            partnerUser: partnerUser,
+            member: chat.member,
+            type: chat.type,
+            _id: chat._id,
+            createdAt: chat.createdAt,
+            updatedAt: chat.updatedAt,
+            latestMessage : latestMessage,
+            sender : sender,
+            lastMessageTime: lastMessageTime
+            }
+    
+        return res.status(httpStatus.OK).json({
+            code: 200,
+            message: "Success",
+            data:  new_element
+
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
 
 module.exports = chatController;
