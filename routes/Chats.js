@@ -27,5 +27,9 @@ chatsRoutes.get(
     auth,
     asyncWrapper(chatController.getChatById),
 );
-
+chatsRoutes.get(
+    "/getChatByUserId/:user_id",
+    auth,
+    asyncWrapper(chatController.getChatByUserId),
+);
 module.exports = chatsRoutes;

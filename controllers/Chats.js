@@ -245,4 +245,33 @@ chatController.getChatById = async (req, res, next) => {
     }
 }
 
+chatController.getChatByUserId = async (req, res, next) => {
+    try {
+        let currentUserId = req.userId;
+        let user_id = req.params.user_id;
+        if (currentUserId == user_id){
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+                message: 'current user id and body user id cant be the same'
+            });
+        }
+        let chats = await ChatModel.findOne({
+                member: {$all: [currentUserId,user_id]}
+        });
+        
+       
+        if (!chats) {
+            return res.status(httpStatus.NOT_FOUND).json({message: "Can not find chat by this user id"});
+        }
+        return res.status(httpStatus.OK).json({
+            code: 200,
+            message: "Success",
+            data:  chats
+
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
 module.exports = chatController;
