@@ -254,18 +254,53 @@ chatController.getChatByUserId = async (req, res, next) => {
                 message: 'current user id and body user id cant be the same'
             });
         }
-        let chats = await ChatModel.findOne({
+        let chat = await ChatModel.findOne({
                 member: {$all: [currentUserId,user_id]}
         });
         
-       
-        if (!chats) {
+        if (!chat) {
             return res.status(httpStatus.NOT_FOUND).json({message: "Can not find chat by this user id"});
         }
+
+        
+        let partnerUser = await UserModel.findOne({_id: user_id},{username: 1, avatar: 1, phonenumber: 1}).populate({path:'avatar',select: '_id type fileName'});
+        let messages = await MessagesModel.find({
+            chat: chat._id
+        }).sort({updatedAt: -1});
+        let latestMessage;
+        let sender;
+        let lastMessageTime;
+        if (messages.length == 0) {
+                latestMessage =  '';
+                sender =  1;
+                lastMessageTime = '';
+        }
+        else {
+            latestMessage =  messages[0].content;
+            lastMessageTime = messages[0].createdAt;
+            if (currentUserId == messages[0].user) {
+                sender = 0;
+            } else {
+                sender = 1;
+            }
+        }
+        var new_element = {
+            partnerUser: partnerUser,
+            member: chat.member,
+            type: chat.type,
+            _id: chat._id,
+            createdAt: chat.createdAt,
+            updatedAt: chat.updatedAt,
+            latestMessage : latestMessage,
+            sender : sender,
+            lastMessageTime: lastMessageTime
+            }
+
+        
         return res.status(httpStatus.OK).json({
             code: 200,
             message: "Success",
-            data:  chats
+            data:  new_element
 
         });
     } catch (e) {
