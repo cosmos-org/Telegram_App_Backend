@@ -1,12 +1,16 @@
 const jwt = require("jsonwebtoken");
+
 const UserModel = require("../models/Users");
 const FriendModel = require("../models/Friends");
+const MessagesModel = require("../models/Messages");
 const ChatModel = require("../models/Chats");
 const httpStatus = require("../utils/httpStatus");
 const bcrypt = require("bcrypt");
 const {JWT_SECRET} = require("../constants/constants");
 const {ROLE_CUSTOMER} = require("../constants/constants");
 const friendsController = {};
+var tdqm = require("ntqdm")();
+
 const {
     PRIVATE_CHAT,
     GROUP_CHAT,
@@ -15,6 +19,219 @@ const {
 // 1: kết bạn
 // 2: từ chối
 // 3: hủy kết bạn
+friendsController.fixFr = async (req, res, next) => {
+    try {
+
+        var frLs = await FriendModel.find({
+        });
+ 
+        console.log('find ' + frLs.length)
+        
+        var i = 0;
+        
+            for(let fr of frLs) {
+                i = i + 1
+                if (fr.receiver.toString() == fr.sender.toString() ) {
+                    console.log('delete ');
+                 await FriendModel.findByIdAndDelete(fr._id);
+                 await ChatModel.deleteMany({
+                     member: {$all: [fr.receiver,fr.receiver]}
+                 });
+                 continue;
+                }
+        }
+    
+        //handle current fr
+    //     console.log('call')
+    //    var frLs = await FriendModel.find({
+        
+    //    });
+       
+    //    console.log('find')
+    //    console.log(frLs.length)
+       
+    //    var i = 0;
+    //    for(let i in frLs) {
+
+    //         for(let j in frLs) {
+    //             if (i == j) continue;
+    //             if( (frLs[i].sender == frLs[j].sender && frLs[i].receiver == frLs[j].receiver) || (frLs[i].receiver == frLs[j].sender && frLs[i].sender == frLs[j].receiver)){
+    //                 console.log('lap')
+    //                 console.log(frLs[i]._id + ' ' + frLs[j]._id);
+                    
+    //                 // var check =  await FriendModel.deleteOne({
+    //                 //     _id: t_chat._id
+    //                 //     })
+    //             }
+    //         }
+          
+    //     }
+        
+    // var frLs = await FriendModel.find({
+    //     status: {
+    //         '$ne':'1'
+    //     }
+    // });
+    // console.log('find')
+    // console.log(frLs.length)
+    // var i = 0;
+    // for(let fr of frLs) {
+    //     // i = i + 1
+    //     // // console.log(fr)
+    //     // if (i % 100 == 0){
+    //     //     console.log(i)
+    //     // }
+    //      let tempChatLs = await ChatModel.find({
+    //            member: {$all: [fr.receiver,fr.sender]}
+    //      });
+         
+    //      if (tempChatLs.length > 0) { //if there are chats for non friend ussers
+    //         console.log('Chat between not friend user');
+    //          for (var t_chat of tempChatLs){
+            
+    //              deleteMsgCheck =  await MessagesModel.deleteMany(
+    //                  {
+    //                      chat: t_chat._id
+    //                  }
+    //              )
+    //              check =  await ChatModel.deleteMany({
+    //                  _id: t_chat._id
+    //                  }
+    //              )
+                 
+                
+    //          }
+    //      }
+    //  }
+
+        res.status(200).json({
+            code: 200,
+            message: "Success",
+        
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
+
+friendsController.fixDb = async (req, res, next) => {
+    try {
+        //handle current fr
+        
+    //    var frLs = await FriendModel.find({
+    //        status: "1"
+    //    });
+
+    //    console.log('find ' + frLs.length)
+       
+    //    var i = 0;
+    //    for(let fr of frLs) {
+    //        i = i + 1
+    //        if (fr.receiver.toString() == fr.sender.toString() ) {
+    //            console.log('delete ');
+    //         await FriendModel.findByIdAndDelete(fr._id);
+    //         await ChatModel.deleteMany({
+    //             member: {$all: [fr.receiver,fr.receiver]}
+    //         });
+    //         continue;
+    //        }
+    //        if (i % 100 == 0){
+    //            console.log(i)
+    //        }
+    //     //    console.log(fr.receiver + ' ' + fr.sender)
+    //         let tempChatLs = await ChatModel.find({
+    //             member: {$all: [fr.receiver,fr.sender]}
+    //         });
+    //         if (tempChatLs.length == 0 ) {
+    //             //add chat
+    //             console.log('no chat for a couple of friend')
+    //             chat = new ChatModel({
+    //                 type: PRIVATE_CHAT,
+    //                 member: [
+    //                     fr.receiver,
+    //                     fr.sender
+    //             ]});
+    //             await chat.save();
+               
+    //         };
+    //         if (tempChatLs.length > 1) { //if multi chat for a friend relation
+    //             console.log('multi chat for a couple of friend');
+                
+    //             for (var t_chat of tempChatLs){
+                
+    //                 var deleteMsgCheck =  await MessagesModel.deleteMany(
+    //                     {
+    //                         chat: t_chat._id
+    //                     }
+    //                 );
+    //                 let c = await ChatModel.findByIdAndDelete(t_chat._id);
+    //                 if (c == null) {
+    //                     console.log('delete fail');
+    //                 }         
+    //             }
+    //         //add one chat
+    //             n_chat = new ChatModel({
+    //                 type: PRIVATE_CHAT,
+    //                 member: [
+    //                     fr.receiver,
+    //                     fr.sender
+    //             ]});
+    //             await n_chat.save()
+    //         }
+           
+    //     }
+    //     console.log('re check');
+        
+    var frLs = await FriendModel.find({
+        status: {
+            '$ne':'1'
+        }
+    });
+    console.log('find')
+    console.log(frLs.length)
+    var i = 0;
+    for(let fr of frLs) {
+        i = i + 1
+        // console.log(fr)
+        if (i % 100 == 0){
+            console.log(i)
+        }
+         let tempChatLs = await ChatModel.find({
+               member: {$all: [fr.receiver,fr.sender]}
+         });
+         
+         if (tempChatLs.length > 0) { //if there are chats for non friend ussers
+            console.log('Chat between not friend user');
+             for (var t_chat of tempChatLs){
+            
+                 deleteMsgCheck =  await MessagesModel.deleteMany(
+                     {
+                         chat: t_chat._id
+                     }
+                 )
+                 check =  await ChatModel.deleteMany({
+                     _id: t_chat._id
+                     }
+                 )
+                 
+                
+             }
+         }
+     }
+
+        res.status(200).json({
+            code: 200,
+            message: "Success",
+        
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
 
 friendsController.setRequest = async (req, res, next) => {
     try {
@@ -142,24 +359,26 @@ friendsController.setAccept = async (req, res, next) => {
                     receiver,
                     sender
                 ]});
-                await chat.save();
-                let finalId = chat.member[0] == receiver? chat.member[1] : chat.member[0];
-                let partnerUser = await UserModel.findOne({_id: finalId},{username: 1, avatar: 1, phonenumber: 1}).populate({path:'avatar',select: '_id type fileName'});
-                
-                var new_chat = {
-                // partnerName: partnerUser.username,
-                // partnerAvatar: partnerUser.avatar.fileName,
-                partnerUser: partnerUser,
-                member: chat.member,
-                type: chat.type,
-                _id: chat._id,
-                createdAt: chat.createdAt,
-                updatedAt: chat.updatedAt,
-                latestMessage : '',
-                sender : 1,
-                lastMessageTime: ''
-              }
+            await chat.save();
+            let finalId = chat.member[0] == receiver? chat.member[1] : chat.member[0];
+            let partnerUser = await UserModel.findOne({_id: finalId},{username: 1, avatar: 1, phonenumber: 1}).populate({path:'avatar',select: '_id type fileName'});
+            
+            var new_chat = {
+            // partnerName: partnerUser.username,
+            // partnerAvatar: partnerUser.avatar.fileName,
+            partnerUser: partnerUser,
+            member: chat.member,
+            type: chat.type,
+            _id: chat._id,
+            createdAt: chat.createdAt,
+            updatedAt: chat.updatedAt,
+            latestMessage : '',
+            sender : 1,
+            lastMessageTime: ''
+            }
         } else {
+            console.log('refuse')
+            
             mes = "Success refuse";
             new_chat = {}
         }
@@ -217,6 +436,7 @@ friendsController.setRemoveRequest = async (req, res, next) => {
 
 friendsController.setRemoveFriend = async (req, res, next) => {
     try {
+        console.log('remove')
         let receiver = req.userId;
         let sender = req.body.user_id;
 
@@ -234,6 +454,26 @@ friendsController.setRemoveFriend = async (req, res, next) => {
                 success: false,
                 message: "Khong thể thao tác",
             });
+        }
+
+        let curentChatLs = await ChatModel.find({
+            member: {$all: [final.receiver,final.sender]}
+         });
+        
+        
+        // console.log(curentChatLs)
+        for (var chat in curentChatLs){
+            console.log(chat._id)
+            deleteMsgCheck =  MessagesModel.deleteMany(
+                {
+                    chat: chat._id
+                }
+            )
+            check =  ChatModel.deleteMany({
+                _id: chat._id
+                }
+            )
+            
         }
 
         final.status = '3';
