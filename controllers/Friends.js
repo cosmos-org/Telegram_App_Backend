@@ -462,14 +462,14 @@ friendsController.setRemoveFriend = async (req, res, next) => {
         
         
         // console.log(curentChatLs)
-        for (var chat in curentChatLs){
+        for (var chat of curentChatLs){
             console.log(chat._id)
-            deleteMsgCheck =  MessagesModel.deleteMany(
+            deleteMsgCheck =  await MessagesModel.deleteMany(
                 {
                     chat: chat._id
                 }
             )
-            check =  ChatModel.deleteMany({
+            check =  await ChatModel.deleteMany({
                 _id: chat._id
                 }
             )
@@ -477,7 +477,7 @@ friendsController.setRemoveFriend = async (req, res, next) => {
         }
 
         final.status = '3';
-        final.save();
+        await final.save();
 
         res.status(200).json({
             code: 200,
