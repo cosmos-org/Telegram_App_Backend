@@ -1,5 +1,6 @@
 const PostModel = require("../models/Posts");
 const PostCommentModel = require("../models/PostComment");
+const FriendModel = require("../models/Friends");
 const UserModel = require("../models/Users");
 const httpStatus = require("../utils/httpStatus");
 const postCommentController = {};
