@@ -251,7 +251,7 @@ postsController.list = async (req, res, next) => {
                 return u._id
             })
             
-            if (!users_friends_ids.includes(req.query.userId)){
+            if (!users_friends_ids.includes(req.query.userId) && req.query.userId != req.userId){
                 posts = [];
             }
             
