@@ -375,7 +375,6 @@ usersController.searchUser = async (req, res, next) => {
         let userId = req.userId;
         let user = await UserModel.findById(userId);
         let blocked_list = user.blocked_inbox;
-        console.log(blocked_list);
         let searchKey = new RegExp(req.body.keyword.toLowerCase(), 'i')
         let result = await UserModel.find( { $and : [
             {

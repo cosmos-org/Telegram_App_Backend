@@ -331,8 +331,20 @@ postsController.list = async (req, res, next) => {
 
 postsController.searchPosts = async (req, res, next) => {
     try {
+        //get friends
+        let requested = await FriendModel.find({sender: req.userId, status: "1" }).distinct('receiver')
+        let accepted = await FriendModel.find({receiver: req.userId, status: "1" }).distinct('sender')
+        let users_friends = await UserModel.find().where('_id').in(requested.concat(accepted)).exec()
+        let users_friends_ids = users_friends.map(u => {
+            return u._id
+        })
+        users_friends_ids.push(req.userId);
+
         let searchKey = new RegExp(req.body.keyword.toLowerCase(), 'i')
-        let result = await PostModel.find({described:  { "$regex": searchKey }}).limit(10).populate({
+        let result = await PostModel.find({$and: [
+            {described:  { "$regex": searchKey }},
+            {author:{$in: users_friends_ids}}
+        ]}).limit(10).populate({
             path: 'author',
             populate: { path: 'avatar' }
           }).populate('images').populate('videos').exec();

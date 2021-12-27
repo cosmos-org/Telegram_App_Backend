@@ -60,7 +60,7 @@ postCommentController.list = async (req, res, next) => {
         let users_friends_ids = users_friends.map(u => {
             return u._id
         })
-        
+        users_friends_ids.push(req.userId);
         
         let postComments = await PostCommentModel.find({
             $and: [
