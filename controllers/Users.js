@@ -370,6 +370,27 @@ usersController.setBlockDiary = async (req, res, next) => {
         });
     }
 }
+usersController.getBlockedUsers = async (req, res, next) => {
+    try {
+        let userId = req.userId;
+        let user = await UserModel.findById(userId);
+        let blocked_list = user.blocked_inbox;
+        let result = [];
+        for (var blocked_id of blocked_list ){
+            let t_user = await UserModel.findById(blocked_id).populate('avatar').populate('cover_image');
+            result.push(t_user);
+        }
+        res.status(200).json({
+            code: 200,
+            message: "Success",
+            data: result
+        });
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: e.message
+        });
+    }
+}
 usersController.searchUser = async (req, res, next) => {
     try {
         let userId = req.userId;

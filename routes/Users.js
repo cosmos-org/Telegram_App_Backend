@@ -39,5 +39,5 @@ usersRoutes.get(
 usersRoutes.post("/set-block-user", auth, usersController.setBlock);
 usersRoutes.post("/set-block-diary", auth, usersController.setBlockDiary);
 usersRoutes.post("/search", auth, usersController.searchUser);
-
+usersRoutes.get('/get-block-list',auth,usersController.getBlockedUsers);
 module.exports = usersRoutes;
