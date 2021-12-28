@@ -24,6 +24,7 @@ yarn-error.log*
 
 .env
 *env
-
-*.jpeg
-*.jpg
+# files/
+# files/*
+# *.jpeg
+# *.jpg
