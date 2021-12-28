@@ -248,10 +248,9 @@ postsController.list = async (req, res, next) => {
             let accepted = await FriendModel.find({receiver: req.userId, status: "1" }).distinct('sender')
             let users_friends = await UserModel.find().where('_id').in(requested.concat(accepted)).exec()
             let users_friends_ids = users_friends.map(u => {
-                return u._id
+                return u._id.toString()
             })
-            
-            if (!users_friends_ids.includes(req.query.userId) && req.query.userId != req.userId){
+            if (!(users_friends_ids.includes(req.query.userId.toString())) && req.query.userId != req.userId){
                 posts = [];
             }
             
