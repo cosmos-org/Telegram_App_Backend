@@ -85,4 +85,44 @@ postCommentController.list = async (req, res, next) => {
 
 }
 
+
+postCommentController.delete = async (req, res, next) => {
+    try {
+        let post = await PostCommentModel.findByIdAndDelete(req.params.id);
+        if (post == null) {
+            return res.status(httpStatus.NOT_FOUND).json({message: "Can not find comment"});
+        }
+        return res.status(httpStatus.OK).json({
+            code: 200,
+            message: 'Success',
+        });
+    } catch (error) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({message: error.message});
+    }
+}
+
+postCommentController.edit = async (req, res, next) => {
+    try {
+        let userId = req.userId;
+    let comment_id = req.params.id;
+    let new_content = req.body.content;
+    let commentFind = await PostCommentModel.findById(comment_id);
+    if (commentFind == null) {
+        return res.status(httpStatus.NOT_FOUND).json({message: "Can not find comment"});
+    }
+    if (commentFind.user.toString() !== userId.toString()) {
+        return res.status(httpStatus.FORBIDDEN).json({message: "Can not edit this comment"});
+    }
+    commentFind.content = new_content;
+    await commentFind.save()
+    return res.status(httpStatus.OK).json({
+        code: 200,
+        message:"Success",
+        data: commentFind
+    });
+    } catch(error){
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({message: error.message});
+    }
+    
+}
 module.exports = postCommentController;

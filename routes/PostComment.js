@@ -15,4 +15,15 @@ postCommentRoutes.get(
     auth,
     asyncWrapper(postCommentController.list),
 );
+postCommentRoutes.get(
+    "/delete/:id",
+    auth,
+    asyncWrapper(postCommentController.delete),
+);
+
+postCommentRoutes.post(
+    "/edit/:id",
+    auth,
+    asyncWrapper(postCommentController.edit),
+);
 module.exports = postCommentRoutes;
