@@ -88,10 +88,22 @@ postCommentController.list = async (req, res, next) => {
 
 postCommentController.delete = async (req, res, next) => {
     try {
-        let post = await PostCommentModel.findByIdAndDelete(req.params.id);
-        if (post == null) {
+        let postComment = await PostCommentModel.findByIdAndDelete(req.params.id);
+        if (postComment == null) {
             return res.status(httpStatus.NOT_FOUND).json({message: "Can not find comment"});
         }
+        try {
+            post = await PostModel.findById(postComment.post);
+            if (post == null) {
+                return res.status(httpStatus.NOT_FOUND).json({message: "Can not find post"});
+            }
+        } catch (error) {
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({message: error.message});
+        }
+        let postSaved = await PostModel.findByIdAndUpdate(postComment.post, {
+            countComments: post.countComments ? post.countComments - 1 : 0
+        })
+
         return res.status(httpStatus.OK).json({
             code: 200,
             message: 'Success',
