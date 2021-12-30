@@ -286,13 +286,15 @@ usersController.setBlock = async (req, res, next) => {
 
         let user = await UserModel.findById(req.userId);
         blocked = []
-        if (user.hasOwnProperty('blocked')) {
+        if (user.blocked_inbox !== undefined) {
+            
             blocked = user.blocked_inbox
         }
     
         if(type) {
      
             if(blocked.indexOf(targetId) === -1) {
+                
                 blocked.push(targetId);
             }
             let friendRc1 = await FriendModel.findOne({ sender: targetId, receiver:  req.userId });
@@ -314,9 +316,9 @@ usersController.setBlock = async (req, res, next) => {
                 blocked.splice(index, 1);
             }
         }
-
+        
         user.blocked_inbox = blocked;
-        user.save();
+        await user.save();
 
         // remove friend and friend request here
 
