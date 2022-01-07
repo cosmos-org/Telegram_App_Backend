@@ -255,7 +255,21 @@ postsController.list = async (req, res, next) => {
             }
             
             else {
-                posts = await PostModel.find({
+                if (page == -1){
+                    posts = await PostModel.find({
+                        author: req.query.userId
+                    }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
+                        path: 'author',
+                        select: '_id username phonenumber avatar',
+                        model: 'Users',
+                        populate: {
+                            path: 'avatar',
+                            select: '_id fileName',
+                            model: 'Documents',
+                        },
+                    }).sort({createdAt: -1})
+                }
+                else posts = await PostModel.find({
                     author: req.query.userId
                 }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
                     path: 'author',
@@ -296,6 +310,21 @@ postsController.list = async (req, res, next) => {
             listIdFriends.push(userId);
             // console.log(listIdFriends);
             // get post of friends of 1 user
+            if (page == -1){
+                posts = await PostModel.find({
+                    "author": listIdFriends
+                }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
+                    path: 'author',
+                    select: '_id username phonenumber avatar',
+                    model: 'Users',
+                    populate: {
+                        path: 'avatar',
+                        select: '_id fileName',
+                        model: 'Documents',
+                    },
+                }).sort({createdAt: -1})
+            }
+            else
             posts = await PostModel.find({
                 "author": listIdFriends
             }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({

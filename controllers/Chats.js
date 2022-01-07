@@ -147,7 +147,7 @@ chatController.getChats = async (req, res, next) => {
             if (messages.length == 0) {
                  latestMessage =  '';
                  sender =  1;
-                 lastMessageTime = '';
+                 lastMessageTime = element.createdAt;
             }
             else {
                 latestMessage =  messages[0].content;
@@ -174,7 +174,11 @@ chatController.getChats = async (req, res, next) => {
               }
             newChats.push(new_element);
         }
+      
 
+        newChats.sort(function(first, second) {
+        return second.lastMessageTime - first.lastMessageTime;
+        });
         return res.status(httpStatus.OK).json({
             code: 200,
             message: "Success",
